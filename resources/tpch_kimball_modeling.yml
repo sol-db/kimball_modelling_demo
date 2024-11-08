@@ -1,0 +1,13 @@
+resources:
+  pipelines:
+    tpch_kimball_modeling:
+      name: tpch_kimball_modeling
+      libraries:
+        - notebook:
+            path: ../src/TPCH Sales Kimball Modelling.sql
+      photon: true
+      channel: CURRENT
+      serverless: true
+      catalog: dbdemos
+      development: true
+      target: tpch_kimball
