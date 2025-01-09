@@ -45,12 +45,13 @@
 -- COMMAND ----------
 
 CREATE OR REFRESH MATERIALIZED VIEW customers_dim (
-  key BIGINT PRIMARY KEY,
+  key BIGINT NOT NULL,
   name STRING,
   address STRING,
   nation STRING,
   region STRING,
-  phone STRING
+  phone STRING,
+  CONSTRAINT customers_dim_pk PRIMARY KEY(key)
 ) AS 
 WITH nation_regions AS (
   SELECT
@@ -96,14 +97,15 @@ SELECT -1, 'unknown name', 'unknown address', 'unknown nation', 'unknown region'
 -- COMMAND ----------
 
 CREATE OR REFRESH MATERIALIZED VIEW parts_dim (
-  key BIGINT PRIMARY KEY,
+  key BIGINT NOT NULL,
   name STRING,
   manufacturer STRING,
   brand STRING,
   type STRING,
   size INT,
   container STRING,
-  price DECIMAL(18,2)
+  price DECIMAL(18,2),
+  CONSTRAINT parts_dim_pk PRIMARY KEY(key)
 ) AS 
 SELECT
   p.p_partkey AS key,
@@ -144,7 +146,7 @@ SELECT -1, 'unknown part', 'unknown manufacturer', 'unknown brand', 'unknown typ
 -- COMMAND ----------
 
 CREATE OR REFRESH MATERIALIZED VIEW date_dim (
-  key BIGINT PRIMARY KEY,
+  key BIGINT NOT NULL,
   date DATE,
   day_of_week_name STRING,
   day_of_week INT,
@@ -155,7 +157,8 @@ CREATE OR REFRESH MATERIALIZED VIEW date_dim (
   month_number INT,
   quarter INT,
   year INT,
-  is_weekend BOOLEAN
+  is_weekend BOOLEAN,
+  CONSTRAINT date_dim_pk PRIMARY KEY(key)
 ) AS
 WITH dates AS (
   SELECT 
@@ -199,13 +202,14 @@ SELECT -1, NULL, 'unknown day of week', NULL, NULL, NULL, NULL, 'unknown month',
 -- COMMAND ----------
 
 CREATE OR REFRESH MATERIALIZED VIEW month_dim (
-  key BIGINT PRIMARY KEY NOT NULL,
+  key BIGINT NOT NULL,
   date DATE,
   month_name STRING,
   month_number INT,
   quarter INT,
   year INT,
-  num_days INT
+  num_days INT,
+  CONSTRAINT month_dim_pk PRIMARY KEY(key)
 ) AS
 WITH dates1 AS (
   SELECT
@@ -269,7 +273,7 @@ CREATE OR REFRESH MATERIALIZED VIEW sales_facts (
   commit_date_key BIGINT CONSTRAINT commit_date_fk FOREIGN KEY REFERENCES dbdemos.tpch_kimball.date_dim,
   receipt_date_key BIGINT CONSTRAINT receipt_date_fk FOREIGN KEY REFERENCES dbdemos.tpch_kimball.date_dim,
   ship_date_key BIGINT CONSTRAINT ship_date_fk FOREIGN KEY REFERENCES dbdemos.tpch_kimball.date_dim,
-  CONSTRAINT sales_pk PRIMARY KEY(order_num, line_item_num)
+  CONSTRAINT sales_facts_pk PRIMARY KEY(order_num, line_item_num)
 ) AS WITH sales AS (
   SELECT
     o.o_orderkey order_num,
@@ -326,7 +330,7 @@ CREATE OR REFRESH MATERIALIZED VIEW daily_sales_snapshot (
   sales_returned DECIMAL(38,2) NOT NULL,
   net_sales DECIMAL(28,2) NOT NULL,
   receipt_date_key BIGINT NOT NULL FOREIGN KEY REFERENCES dbdemos.tpch_kimball.date_dim,
-  CONSTRAINT daily_sales_pk PRIMARY KEY(receipt_date_key, customer_key, part_key)
+  CONSTRAINT daily_sales_snapshot_pk PRIMARY KEY(receipt_date_key, customer_key, part_key)
 )
 AS SELECT
   d.key AS receipt_date_key,
@@ -372,7 +376,7 @@ CREATE OR REFRESH MATERIALIZED VIEW monthly_sales_snapshot (
   sales_returned DECIMAL(38,2) NOT NULL,
   net_sales DECIMAL(38,2) NOT NULL,
   reciept_month_key BIGINT NOT NULL FOREIGN KEY REFERENCES dbdemos.tpch_kimball.month_dim,
-  CONSTRAINT monthly_sales_pk PRIMARY KEY(reciept_month_key, customer_key, part_key)
+  CONSTRAINT monthly_sales_snapshot_pk PRIMARY KEY(reciept_month_key, customer_key, part_key)
 )
 AS SELECT
   if(receipt_date_key != -1, receipt_date_key div 100, receipt_date_key) AS reciept_month_key,

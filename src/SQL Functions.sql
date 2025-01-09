@@ -1,4 +1,8 @@
 -- Databricks notebook source
+CREATE SCHEMA IF NOT EXISTS dbdemos.tpch_kimball
+
+-- COMMAND ----------
+
 CREATE OR REPLACE FUNCTION dbdemos.tpch_kimball.date_key(input_date DATE)
 RETURNS BIGINT
 COMMENT 'Converts a DATE into a Surrogate Key for the `date_dim` table'

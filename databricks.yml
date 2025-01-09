@@ -14,17 +14,3 @@ targets:
     # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
     mode: development
     default: true
-    workspace:
-      host: https://adb-7674599708099350.10.azuredatabricks.net
-
-  prod:
-    mode: production
-    workspace:
-      host: https://adb-7674599708099350.10.azuredatabricks.net
-      # We explicitly specify /Workspace/Users/sol.ackerman@databricks.com to make sure we only have a single copy.
-      root_path: /Workspace/Users/sol.ackerman@databricks.com/.bundle/${bundle.name}/${bundle.target}
-    permissions:
-      - user_name: sol.ackerman@databricks.com
-        level: CAN_MANAGE
-    run_as:
-      user_name: sol.ackerman@databricks.com
